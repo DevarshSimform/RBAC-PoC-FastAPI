@@ -11,3 +11,41 @@ wheels/
 
 # Virtual environments
 .venv
+venv/
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.*
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Test cache
+.pytest_cache/
+.tox/
+
+# FastAPI specific
+.fastapi
+
+# local DB-files
+*.sqlite3
+*.sqlite
+*.db-journal
+*.db-shm
+*.db-wal
+*.db
