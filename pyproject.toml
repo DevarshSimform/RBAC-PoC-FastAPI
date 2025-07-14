@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[all]>=0.116.1",
+    "passlib[bcrypt]>=1.7.4",
     "pre-commit>=4.2.0",
+    "python-decouple>=3.8",
+    "sqlalchemy>=2.0.41",
     "uvicorn>=0.35.0",
 ]

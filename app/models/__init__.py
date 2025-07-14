@@ -1,0 +1,9 @@
+from app.models.audit_log import AuditLog  # noqa: F401
+from app.models.module import Module  # noqa: F401
+from app.models.object_permission import ObjectPermission  # noqa: F401
+from app.models.permission import Permission  # noqa: F401
+from app.models.resource import Resource  # noqa: F401
+from app.models.role import Role  # noqa: F401
+from app.models.role_permission import RolePermission  # noqa: F401
+from app.models.user import User  # noqa: F401
+from app.models.user_role import UserRole  # noqa: F401
