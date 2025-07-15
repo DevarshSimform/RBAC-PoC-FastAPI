@@ -29,9 +29,9 @@ def seed_initial_data():
         User,
         email="superadmin@example.com",
         defaults={
-            "firstname": "Super",
-            "lastname": "Admin",
-            "password_hash": get_password_hash("SuperAdmin123"),
+            "firstname": "super",
+            "lastname": "admin",
+            "password_hash": get_password_hash("Admin@123"),
             "last_login": None,
             "created_at": now,
             "updated_at": now,
@@ -92,7 +92,7 @@ def seed_initial_data():
     superadmin_role, _ = get_or_create(
         db,
         Role,
-        name="SuperAdmin",
+        name="superadmin",
         defaults={
             "description": "System SuperAdmin with all permissions",
             "created_by": superadmin_user.id,
