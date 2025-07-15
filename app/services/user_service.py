@@ -21,7 +21,6 @@ class UserService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User with this email already exists.",
             )
-
         new_user = self.user_repo.create_user(user_data)
         if not new_user:
             raise HTTPException(

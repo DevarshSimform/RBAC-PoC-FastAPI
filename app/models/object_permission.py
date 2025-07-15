@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, UniqueConstraint
 
 from app.db.database import Base
 
@@ -7,10 +7,10 @@ class ObjectPermission(Base):
     __tablename__ = "object_permissions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    resource_id = Column(String, ForeignKey("resources.id"), nullable=False)
-    permission_id = Column(String, ForeignKey("permissions.id"), nullable=False)
-    granted_by = Column(String, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    resource_id = Column(Integer, ForeignKey("resources.id"), nullable=False)
+    permission_id = Column(Integer, ForeignKey("permissions.id"), nullable=False)
+    granted_by = Column(Integer, ForeignKey("users.id"))
     granted_at = Column(DateTime)
     expires_at = Column(DateTime)
 

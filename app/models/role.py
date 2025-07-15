@@ -9,6 +9,6 @@ class Role(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
-    parent_role_id = Column(String, ForeignKey("roles.id"), nullable=True)
+    parent_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     created_at = Column(DateTime)
-    created_by = Column(String, ForeignKey("users.id"))
+    created_by = Column(Integer, ForeignKey("users.id"))

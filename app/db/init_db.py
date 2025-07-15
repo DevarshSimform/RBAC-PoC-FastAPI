@@ -27,7 +27,7 @@ def seed_initial_data():
     superadmin_user, _ = get_or_create(
         db,
         User,
-        email="superadmin@example.com",
+        email="superadmin@gmail.com",
         defaults={
             "firstname": "super",
             "lastname": "admin",
@@ -40,7 +40,7 @@ def seed_initial_data():
 
     # 2. Create CRUD actions
     action_objs = {}
-    for action_name in ["create", "read", "update", "delete"]:
+    for action_name in ["create", "view", "update", "delete"]:
         action, _ = get_or_create(
             db,
             Action,

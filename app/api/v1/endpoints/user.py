@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Form
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user_with_db
+from app.core.dependencies import check_permission, get_current_user_with_db
 from app.db.database import get_db
 from app.schemas.user_schema import (
     LoginUser,
@@ -59,6 +59,7 @@ def get_all_users(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
+    _: bool = Depends(check_permission("user", "view")),
 ) -> list[RegisterUserResponse]:
     """Fetch all registered users."""
 
@@ -79,6 +80,7 @@ def get_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
+    _: bool = Depends(check_permission("user", "view")),
 ) -> UserRetrieveResponse:
     """Fetch details of a specific user by ID."""
 
@@ -98,6 +100,7 @@ def update_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
+    _: bool = Depends(check_permission("user", "update")),
 ) -> UserRetrieveResponse:
     """Update user details in the database."""
 
@@ -109,13 +112,14 @@ def update_user(
 @router.delete("/", tags=["Admin"], description="Superadmin deletes a user.")
 def delete_user(
     user_id: int,
-    superadmin_user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
+    user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
+    _: bool = Depends(check_permission("user", "delete")),
 ):
     """Delete a user from the system."""
 
-    user, db = superadmin_user_with_db
+    user, db = user_with_db
     service = UserService(db)
     service.delete_user(user_id)
     return {"detail": f"User with id {user_id} deleted successfully by {user.email}."}
