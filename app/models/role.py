@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from app.db.database import Base
@@ -9,6 +11,8 @@ class Role(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
-    parent_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
-    created_at = Column(DateTime)
+    parent_role_id = Column(
+        Integer, ForeignKey("roles.id"), nullable=True, default=None
+    )
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
     created_by = Column(Integer, ForeignKey("users.id"))
