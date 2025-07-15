@@ -2,9 +2,9 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
+from app.core.security import get_password_hash
 from app.db.database import SessionLocal
 from app.models import Action, Module, Permission, Role, RolePermission, User, UserRole
-from app.utils.hashing import get_password_hash
 
 
 def get_or_create(db: Session, model, defaults=None, **kwargs):
@@ -27,11 +27,11 @@ def seed_initial_data():
     superadmin_user, _ = get_or_create(
         db,
         User,
-        email="superadmin@example.com",
+        email="superadmin@gmail.com",
         defaults={
-            "firstname": "Super",
-            "lastname": "Admin",
-            "password_hash": get_password_hash("SuperAdmin123"),
+            "firstname": "super",
+            "lastname": "admin",
+            "password_hash": get_password_hash("Admin@123"),
             "last_login": None,
             "created_at": now,
             "updated_at": now,
@@ -40,7 +40,7 @@ def seed_initial_data():
 
     # 2. Create CRUD actions
     action_objs = {}
-    for action_name in ["create", "read", "update", "delete"]:
+    for action_name in ["create", "view", "update", "delete"]:
         action, _ = get_or_create(
             db,
             Action,
@@ -92,7 +92,7 @@ def seed_initial_data():
     superadmin_role, _ = get_or_create(
         db,
         Role,
-        name="SuperAdmin",
+        name="superadmin",
         defaults={
             "description": "System SuperAdmin with all permissions",
             "created_by": superadmin_user.id,

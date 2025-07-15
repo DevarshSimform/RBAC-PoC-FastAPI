@@ -1,3 +1,4 @@
+from app.models.action import Action  # noqa: F401
 from app.models.audit_log import AuditLog  # noqa: F401
 from app.models.module import Module  # noqa: F401
 from app.models.object_permission import ObjectPermission  # noqa: F401

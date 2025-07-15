@@ -9,10 +9,10 @@ class Permission(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
-    module_id = Column(String, ForeignKey("modules.id"), nullable=False)
-    action_id = Column(String, ForeignKey("actions.id"), nullable=False)
+    module_id = Column(Integer, ForeignKey("modules.id"), nullable=False)
+    action_id = Column(Integer, ForeignKey("actions.id"), nullable=False)
     created_at = Column(DateTime)
-    created_by = Column(String, ForeignKey("users.id"))
+    created_by = Column(Integer, ForeignKey("users.id"))
 
     __table_args__ = (
         UniqueConstraint("module_id", "action_id", name="uq_module_action"),

@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
+from app.api.v1.endpoints.user import router as user_router
 from app.db.database import Base, engine
 from app.models import (  # noqa: F401
     action,
@@ -16,11 +17,7 @@ from app.models import (  # noqa: F401
 )
 
 app = FastAPI(title="RBAC PoC FastAPI", version="0.1.0")
-
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to RBAC PoC FastAPI!"}
+app.include_router(user_router, prefix="/api/v1")
 
 
 @app.on_event("startup")
