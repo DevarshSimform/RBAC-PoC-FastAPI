@@ -2,9 +2,9 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
+from app.core.security import get_password_hash
 from app.db.database import SessionLocal
 from app.models import Action, Module, Permission, Role, RolePermission, User, UserRole
-from app.utils.hashing import get_password_hash
 
 
 def get_or_create(db: Session, model, defaults=None, **kwargs):
