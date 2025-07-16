@@ -15,3 +15,11 @@ class RoleResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class RoleUpdate(BaseModel):
+    name: str
+    description: str
+
+    class Config:
+        orm_mode = True

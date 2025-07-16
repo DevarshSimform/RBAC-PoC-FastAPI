@@ -84,7 +84,7 @@ def get_user(
 ) -> UserRetrieveResponse:
     """Fetch details of a specific user by ID."""
 
-    user, db = user_with_db
+    _, db = user_with_db
     service = UserService(db)
     return service.retrieve_user(user_id)
 
