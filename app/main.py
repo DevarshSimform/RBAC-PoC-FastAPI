@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.api.v1.endpoints.role_route import router as role_router
+from app.api.v1.endpoints.user_role_route import router as user_role_router
 from app.api.v1.endpoints.user_route import router as user_router
 from app.db.database import Base, engine
 from app.models import (  # noqa: F401
@@ -20,6 +21,7 @@ from app.models import (  # noqa: F401
 app = FastAPI(title="RBAC PoC FastAPI", version="0.1.0")
 app.include_router(user_router, prefix="/api/v1")
 app.include_router(role_router, prefix="/api/v1")
+app.include_router(user_role_router, prefix="/api/v1")
 
 
 @app.on_event("startup")
