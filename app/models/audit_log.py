@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from app.db.database import Base
@@ -11,5 +13,5 @@ class AuditLog(Base):
     action = Column(String)
     target_type = Column(String)
     target_id = Column(String)
-    timestamp = Column(DateTime)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     details = Column(String)

@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, UniqueConstraint
 
 from app.db.database import Base
@@ -10,6 +12,6 @@ class UserRole(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     assigned_by = Column(Integer, ForeignKey("users.id"))
-    assigned_at = Column(DateTime)
+    assigned_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("user_id", "role_id", name="uq_user_role"),)

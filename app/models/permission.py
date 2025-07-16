@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 
 from app.db.database import Base
@@ -11,7 +13,7 @@ class Permission(Base):
     description = Column(String)
     module_id = Column(Integer, ForeignKey("modules.id"), nullable=False)
     action_id = Column(Integer, ForeignKey("actions.id"), nullable=False)
-    created_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
     created_by = Column(Integer, ForeignKey("users.id"))
 
     __table_args__ = (
