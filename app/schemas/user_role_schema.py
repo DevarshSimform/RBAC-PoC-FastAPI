@@ -1,4 +1,6 @@
-from pydantic import BaseModel, conlist
+from typing import List
+
+from pydantic import BaseModel
 
 
 class AssignRolesRequest(BaseModel):
@@ -11,7 +13,7 @@ class UnassignRolesRequest(BaseModel):
 
 class UserRoleResponse(BaseModel):
     user_id: int
-    role_ids: conlist(int)
+    role_ids: List[int]
 
     class Config:
         orm_mode = True

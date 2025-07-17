@@ -30,15 +30,11 @@ class UserRoleRepository:
 
     def delete_user_role(self, user_id, role_id):
         """Delete a user role association."""
-        print(
-            f"---------Inside delete_user_role REPO: user_id={user_id}, role_id={role_id}---------"
-        )
         user_role = (
             self.db.query(UserRole)
             .filter(UserRole.user_id == user_id, UserRole.role_id == role_id)
             .first()
         )
-        print(f"---------user_role={user_role}---------")
         if not user_role:
             return False
         self.db.delete(user_role)

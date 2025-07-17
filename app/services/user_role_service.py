@@ -35,9 +35,6 @@ class UserRoleService:
 
     def deassign_role_to_user(self, user_id: int, role_id: int) -> None:
         """Deassign a role to a user."""
-        print(
-            f"---------Inside deassign_role_to_user SERVICE: user_id={user_id}, role_id={role_id}---------"
-        )
         deleted = self.user_role_repo.delete_user_role(user_id, role_id)
         if not deleted:
             raise HTTPException(
