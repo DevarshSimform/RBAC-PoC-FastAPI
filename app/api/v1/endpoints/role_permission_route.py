@@ -6,6 +6,7 @@ from app.models import User
 from app.schemas.role_permission_schema import (
     AssignPermissionRequest,
     DeAssignPermissionRequest,
+    RolePermissionResponse,
 )
 from app.services.role_permission_service import RolePermissionService
 
@@ -30,6 +31,41 @@ def assign_permission_to_role(
     service = RolePermissionService(db)
     service.assign_permission_to_role(role_id, body.permission_ids, granted_by=user.id)
     return {"message": "Permissions assigned successfully."}
+
+
+@router.get(
+    "/assigned-permissions",
+    response_model=RolePermissionResponse,
+    tags=["Role Permission"],
+    description="Get all permissions assigned to a role.",
+)
+def get_assigned_permissions(
+    user_id: int,
+    user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
+    _: bool = Depends(check_permission("role_permission", "view")),
+):
+    """Get all permissions assigned to a role."""
+
+    _, db = user_with_db
+    service = RolePermissionService(db)
+    return service.get_assigned_permissions(user_id)
+
+
+@router.get(
+    "/my-permissions",
+    response_model=RolePermissionResponse,
+    tags=["Role Permission"],
+    description="Logged in user permissions.",
+)
+def get_my_permissions(
+    user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
+    _: bool = Depends(check_permission("role_permission", "view")),
+) -> RolePermissionResponse:
+    """Get permissions for the logged-in user."""
+
+    user, db = user_with_db
+    service = RolePermissionService(db)
+    return service.get_assigned_permissions(user.id)
 
 
 @router.delete(
