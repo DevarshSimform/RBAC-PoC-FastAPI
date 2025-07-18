@@ -70,7 +70,10 @@ def check_permission(
         action = db.query(Action).filter_by(name=action_name).first()
 
         if not module or not action:
-            raise HTTPException(status_code=400, detail="Invalid module or action")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid module or action",
+            )
 
         permission = (
             db.query(Permission)
@@ -79,7 +82,9 @@ def check_permission(
         )
 
         if not permission:
-            raise HTTPException(status_code=403, detail="Permission not found")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Permission not found"
+            )
 
         # 2. If resource_id_param is given, check object-level access
         if resource_id_param:
@@ -88,7 +93,7 @@ def check_permission(
             ) or request.query_params.get(resource_id_param)
             if not resource_id_value:
                 raise HTTPException(
-                    status_code=400,
+                    status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Missing `{resource_id_param}` for object-level permission check.",
                 )
 
@@ -130,7 +135,7 @@ def check_permission(
 
         # 4. Final denial
         raise HTTPException(
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Access denied: no permission for '{module_name}:{action_name}'.",
         )
 
