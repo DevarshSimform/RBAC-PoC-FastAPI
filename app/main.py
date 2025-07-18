@@ -5,7 +5,8 @@ from app.api.v1.endpoints.role_permission_route import router as role_permission
 from app.api.v1.endpoints.role_route import router as role_router
 from app.api.v1.endpoints.user_role_route import router as user_role_router
 from app.api.v1.endpoints.user_route import router as user_router
-from app.db.database import Base, engine
+
+# from app.db.database import Base, engine
 from app.models import (  # noqa: F401
     action,
     audit_log,
@@ -29,7 +30,8 @@ app.include_router(role_permission_router, prefix="/api/v1")
 @app.on_event("startup")
 def startup():
     """Create database tables on startup"""
-    Base.metadata.create_all(bind=engine)
+    # Base.metadata.create_all(bind=engine)
+    pass
 
 
 def main():
