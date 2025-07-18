@@ -68,7 +68,7 @@ def seed_initial_data(session):
 
     # Seed superadmin user if it doesn't exist
     result = session.execute(
-        text("SELECT id FROM users WHERE email = 'superadmin@example.com'")
+        text("SELECT id FROM users WHERE email = 'superadmin@gmail.com'")
     )
     superadmin_user = result.fetchone()
 
@@ -77,13 +77,13 @@ def seed_initial_data(session):
             text(
                 """
                 INSERT INTO users (firstname, lastname, email, password_hash)
-                VALUES ('superadmin', 'superadmin', 'superadmin@example.com', 'Admin@123')
+                VALUES ('superadmin', 'superadmin', 'superadmin@gmail.com', 'Admin@123')
             """
             )
         )
         print("   ✅ Created superadmin user")
         result = session.execute(
-            text("SELECT id FROM users WHERE email = 'superadmin@example.com'")
+            text("SELECT id FROM users WHERE email = 'superadmin@gmail.com'")
         )
         superadmin_user = result.fetchone()
 

@@ -103,30 +103,18 @@ python manage.py seed_permissions
 ### 5️⃣ Seed Initial Data
 
 Seed the system with foundational data:
+To seed initial data you need to create initial migration to create db_schema then you can run migrate command to seed all required initial data.
+If there is no migration inside migrations/versions, migrate will not work
 
-```bash
-uv run python app/db/init_db.py
-```
 
-This will create:
-- One SuperAdmin user
-- Base Actions: create, read, update, delete
-- Base Modules: e.g., Post, Invoice etc.
-- System actions that are reusable across all modules
-- Foundational modules in the system
-- A SuperAdmin user with full access
-- Permissions for each action + module combination
-- All permissions assigned to the SuperAdmin role
-- SuperAdmin role assigned to the seeded user
+#### 🧪 superadmin User Credentials
 
-#### 🧪 SuperAdmin User Credentials
+After running the seed script or migrate command, the superadmin user is created with the following default credentials:
 
-After running the seed script, the SuperAdmin user is created with the following default credentials:
+- **Email**: superadmin@gmail.com
+- **Password**: Admin@123
 
-- **Email**: superadmin@example.com
-- **Password**: SuperAdmin123
-
-> ⚠️ **Security Note**: Change these credentials in `init_db.py` or immediately after login in your production environment.
+> ⚠️ **Security Note**: Change these credentials in `seed_permissions.py` or immediately after login in your production environment.
 
 ### 6️⃣ Run the Application
 
@@ -284,7 +272,7 @@ uv run pytest --cov=app
 
 1. **Environment Variables**: Update all environment variables for production
 2. **Database**: Set up production PostgreSQL database
-3. **Security**: Change default SuperAdmin credentials
+3. **Security**: Change default superadmin credentials
 4. **Migrations**: Run all migrations in production
 5. **Logging**: Configure appropriate logging levels
 6. **Monitoring**: Set up application monitoring
