@@ -20,6 +20,8 @@ import sys
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
+from app.core.security import get_password_hash
+
 # Database configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")  # Adjust as needed
 
@@ -73,13 +75,23 @@ def seed_initial_data(session):
     superadmin_user = result.fetchone()
 
     if not superadmin_user:
+        # Get hashed password
+        hashed_password = get_password_hash("Admin@123")
+
+        # Use parameterized query to avoid SQL injection and escaping issues
         session.execute(
             text(
                 """
                 INSERT INTO users (firstname, lastname, email, password_hash)
-                VALUES ('superadmin', 'superadmin', 'superadmin@gmail.com', 'Admin@123')
+                VALUES (:firstname, :lastname, :email, :password_hash)
             """
-            )
+            ),
+            {
+                "firstname": "superadmin",
+                "lastname": "superadmin",
+                "email": "superadmin@gmail.com",
+                "password_hash": hashed_password,
+            },
         )
         print("   ✅ Created superadmin user")
         result = session.execute(
@@ -111,13 +123,25 @@ def seed_initial_data(session):
 
 def get_all_tables(session):
     """Get all tables from the database"""
-    tables_query = text(
-        """
-        SELECT name FROM sqlite_master
-        WHERE type='table' AND name NOT LIKE 'sqlite_%'
-        AND name NOT IN ('alembic_version')
-    """
-    )
+    # Check if we're using SQLite or PostgreSQL
+    if "sqlite" in DATABASE_URL.lower():
+        tables_query = text(
+            """
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name NOT LIKE 'sqlite_%'
+            AND name NOT IN ('alembic_version')
+            """
+        )
+    else:
+        # PostgreSQL query
+        tables_query = text(
+            """
+            SELECT tablename FROM pg_tables
+            WHERE schemaname = 'public'
+            AND tablename NOT IN ('alembic_version')
+            """
+        )
+
     return {row[0] for row in session.execute(tables_query).fetchall()}
 
 

@@ -33,7 +33,6 @@ def get_current_user_with_db(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:
     """Dependency to get the current user from the token."""
-    print("----------------Inside get_current dependency----------------")
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid or expired token",
