@@ -14,7 +14,7 @@ class ObjectPermission(Base):
     permission_id = Column(Integer, ForeignKey("permissions.id"), nullable=False)
     granted_by = Column(Integer, ForeignKey("users.id"))
     granted_at = Column(DateTime, default=datetime.datetime.utcnow)
-    expires_at = Column(DateTime)
+    expires_at = Column(DateTime, nullable=True)
 
     __table_args__ = (
         UniqueConstraint("user_id", "resource_id", "permission_id", name="uq_obj_perm"),

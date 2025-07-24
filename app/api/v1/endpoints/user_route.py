@@ -59,7 +59,7 @@ def get_all_users(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("user", "view")),
+    _: bool = Depends(check_permission("users", "read")),
 ) -> list[RegisterUserResponse]:
     """Fetch all registered users."""
 
@@ -80,7 +80,7 @@ def get_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("user", "view")),
+    _: bool = Depends(check_permission("users", "read", resource_id_param="user_id")),
 ) -> UserRetrieveResponse:
     """Fetch details of a specific user by ID."""
 
@@ -100,7 +100,7 @@ def update_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("user", "update")),
+    _: bool = Depends(check_permission("users", "update")),
 ) -> UserRetrieveResponse:
     """Update user details in the database."""
 
@@ -115,7 +115,7 @@ def delete_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("user", "delete")),
+    _: bool = Depends(check_permission("users", "delete")),
 ):
     """Delete a user from the system."""
 
