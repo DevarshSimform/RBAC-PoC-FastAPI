@@ -18,7 +18,7 @@ router = APIRouter(prefix="/role")
 def create_role(
     role_data: CreateRoleRequest,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("role", "create")),
+    _: bool = Depends(check_permission("roles", "create")),
 ) -> RoleResponse:
     """Create a new role in the system."""
 
@@ -35,7 +35,7 @@ def create_role(
 )
 def get_all_roles(
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("role", "view")),
+    _: bool = Depends(check_permission("roles", "read")),
 ) -> list[RoleResponse]:
     """Retrieve all roles in the system."""
 
@@ -53,7 +53,7 @@ def get_all_roles(
 def get_role(
     role_id: int,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("role", "view")),
+    _: bool = Depends(check_permission("roles", "read")),
 ) -> RoleResponse:
     """Fetch details of a specific role by ID."""
 
@@ -72,7 +72,7 @@ def update_role(
     role_id: int,
     role_data: RoleUpdate,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("role", "update")),
+    _: bool = Depends(check_permission("roles", "update")),
 ) -> RoleResponse:
     """Update details of a specific role by ID."""
 
@@ -89,7 +89,7 @@ def update_role(
 def delete_role(
     role_id: int,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("role", "delete")),
+    _: bool = Depends(check_permission("roles", "delete")),
 ):
     """Delete a role from the system."""
 

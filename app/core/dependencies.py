@@ -56,22 +56,22 @@ def get_current_user_with_db(
 def check_permission(
     module_name: str,
     action_name: str,
-    resource_id_param: Optional[str] = None,  # Optional: name of param in path/query
+    resource_id_param: Optional[str] = None,
 ):
     def checker(
         request: Request,
-        user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
+        user_with_db: tuple = Depends(get_current_user_with_db),
     ):
         user, db = user_with_db
 
-        # 1. Fetch module, action, permission
+        # --- Resolve Permission ---
         module = db.query(Module).filter_by(name=module_name).first()
         action = db.query(Action).filter_by(name=action_name).first()
 
         if not module or not action:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid module or action",
+                detail="Invalid module or action name",
             )
 
         permission = (
@@ -82,45 +82,15 @@ def check_permission(
 
         if not permission:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Permission not found"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission not found for {module_name}:{action_name}",
             )
 
-        # 2. If resource_id_param is given, check object-level access
-        if resource_id_param:
-            resource_id_value = request.path_params.get(
-                resource_id_param
-            ) or request.query_params.get(resource_id_param)
-            if not resource_id_value:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Missing `{resource_id_param}` for object-level permission check.",
-                )
-
-            # Find matching resource
-            resource = (
-                db.query(Resource)
-                .filter_by(module_id=module.id, foreign_id=resource_id_value)
-                .first()
-            )
-
-            if resource:
-                obj_perm = (
-                    db.query(ObjectPermission)
-                    .filter_by(
-                        user_id=user.id,
-                        resource_id=resource.id,
-                        permission_id=permission.id,
-                    )
-                    .first()
-                )
-                if obj_perm:
-                    return True
-
-        # 3. Else, check role-based access
+        # --- Check Role-Level Permissions ---
         role_ids = db.query(UserRole.role_id).filter_by(user_id=user.id).all()
         role_ids = [r[0] for r in role_ids]
 
-        has_role_perm = (
+        has_role_permission = (
             db.query(RolePermission)
             .filter(
                 RolePermission.role_id.in_(role_ids),
@@ -129,13 +99,46 @@ def check_permission(
             .first()
         )
 
-        if has_role_perm:
+        if has_role_permission:
             return True
 
-        # 4. Final denial
+        # --- Check Object-Level Permissions (if applicable) ---
+        if resource_id_param:
+            # Try to extract resource_id from path or query
+            resource_value = request.path_params.get(
+                resource_id_param
+            ) or request.query_params.get(resource_id_param)
+
+            if not resource_value:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Missing `{resource_id_param}` for object-level permission check.",
+                )
+
+            # Find resource by module + foreign_id
+            resource = (
+                db.query(Resource)
+                .filter_by(module_id=module.id, foreign_id=resource_value)
+                .first()
+            )
+
+            if resource:
+                object_permission = (
+                    db.query(ObjectPermission)
+                    .filter_by(
+                        user_id=user.id,
+                        resource_id=resource.id,
+                        permission_id=permission.id,
+                    )
+                    .first()
+                )
+                if object_permission:
+                    return True
+
+        # --- Final Denial ---
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Access denied: no permission for '{module_name}:{action_name}'.",
+            detail=f"Access denied: missing permission for '{module_name}:{action_name}'",
         )
 
     return checker

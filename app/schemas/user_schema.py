@@ -19,7 +19,7 @@ class RegisterUserResponse(BaseModel):
     firstname: str
     lastname: str
     email: EmailStr
-    created_at: datetime
+    created_at: datetime | None = None
 
     class Config:
         orm_mode = True
