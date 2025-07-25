@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Form
+from fastapi import APIRouter, Body, Depends, Form, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import check_permission, get_current_user_with_db
@@ -21,6 +21,7 @@ router = APIRouter(prefix="/user")
 @router.post(
     "/register",
     response_model=RegisterUserResponse,
+    status_code=status.HTTP_201_CREATED,
     tags=["User"],
     description="Register a new user.",
 )

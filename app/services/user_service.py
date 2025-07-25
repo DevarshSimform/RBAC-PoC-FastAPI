@@ -19,7 +19,7 @@ class UserService:
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this email already exists.",
+                detail="User with this email already registered.",
             )
         new_user = self.user_repo.create_user(user_data)
         if not new_user:

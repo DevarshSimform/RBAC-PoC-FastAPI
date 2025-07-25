@@ -14,3 +14,29 @@ dependencies = [
     "sqlalchemy>=2.0.41",
     "uvicorn>=0.35.0",
 ]
+
+[project.optional-dependencies]
+test = [
+    # Core testing framework
+    "pytest>=7.4.2",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.1",
+    "pytest-xdist>=3.3.1",
+    
+    # HTTP client for API testing
+    "httpx>=0.24.1",
+    
+    # Test data factories
+    "factory-boy>=3.3.0",
+    
+    # FastAPI testing utilities
+    "python-multipart>=0.0.6",
+    
+    # Security testing (JWT handling)
+    "python-jose[cryptography]>=3.3.0",
+    
+    # Mock and test utilities
+    "responses>=0.23.3",
+    "freezegun>=1.2.2",
+]

@@ -1,0 +1,24 @@
+# Testing dependencies
+pytest==7.4.2
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+pytest-xdist==3.3.1
+httpx==0.24.1
+factory-boy==3.3.0
+
+# FastAPI testing
+fastapi[all]==0.103.1
+python-multipart==0.0.6
+
+# Database testing
+sqlalchemy==2.0.20
+alembic==1.12.0
+
+# Security testing
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Mock and utilities
+responses==0.23.3
+freezegun==1.2.2

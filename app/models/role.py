@@ -1,6 +1,7 @@
 import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.db.database import Base
 
@@ -16,3 +17,12 @@ class Role(Base):
     )
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     created_by = Column(Integer, ForeignKey("users.id"))
+
+    # Relationships
+    creator = relationship(
+        "User", back_populates="created_roles", foreign_keys=[created_by]
+    )
+    user_roles = relationship(
+        "UserRole", back_populates="role", foreign_keys="[UserRole.role_id]"
+    )
+    parent_role = relationship("Role", remote_side=[id], backref="child_roles")
