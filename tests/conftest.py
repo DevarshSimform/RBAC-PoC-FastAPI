@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.core.dependencies import get_current_user_with_db, get_db
+from app.core.dependencies import get_current_user_with_db
 from app.db.database import Base
 from app.main import app
 from app.models.action import Action
@@ -22,7 +22,7 @@ from app.models.role import Role
 from app.models.user import User
 
 # Test database setup
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -32,9 +32,10 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function", autouse=True)
 def db_engine():
     """Create test database engine."""
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield engine
     Base.metadata.drop_all(bind=engine)
@@ -55,18 +56,25 @@ def db_session(db_engine):
         connection.close()
 
 
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @pytest.fixture(scope="function")
-def client(db_session):
+def client():
     """Create a test client with dependency overrides."""
 
-    def override_get_db():
-        yield db_session
-
-    app.dependency_overrides[get_db] = override_get_db
+    # CRITICAL: Set overrides BEFORE creating client
+    app.dependency_overrides[get_current_user_with_db] = override_get_db
 
     with TestClient(app) as test_client:
         yield test_client
 
+    # Clean up overrides after test
     app.dependency_overrides.clear()
 
 
@@ -88,6 +96,8 @@ def authenticated_client(client, mock_user, db_session):
     # Add the mock user to the database
     db_session.add(mock_user)
     db_session.commit()
+
+    print(f"**********Mock User Added: {mock_user}**********")
 
     def override_get_current_user_with_db():
         return mock_user

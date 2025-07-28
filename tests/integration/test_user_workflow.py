@@ -130,7 +130,7 @@ class TestUserPermissionsWorkflow:
             firstname="Permission",
             lastname="Test",
             email="permission@test.com",
-            password="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6bm4KyU7fu",
+            password_hash="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6bm4KyU7fu",
         )
         db_session.add(user)
         db_session.commit()
@@ -208,7 +208,10 @@ class TestDatabaseTransactionWorkflow:
         """Test handling of concurrent user operations."""
         # Create a user
         user = User(
-            firstname="Concurrent", lastname="Test", email="concurrent@test.com"
+            firstname="Concurrent",
+            lastname="Test",
+            email="concurrent@test.com",
+            password_hash="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6bm4KyU7fu",
         )
         db_session.add(user)
         db_session.commit()
