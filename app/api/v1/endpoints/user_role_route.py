@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import check_permission, get_current_user_with_db
+from app.core.dependencies import get_current_user_with_db, has_permission
 from app.models import User
 from app.schemas.user_role_schema import (
     AssignRolesRequest,
@@ -23,7 +23,7 @@ def assign_role_to_user(
     user_id: int,
     body: AssignRolesRequest,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("user_roles", "create")),
+    _: bool = Depends(has_permission("user_roles", "create")),
 ) -> None:
     """Assign a role to a user."""
 
@@ -42,7 +42,7 @@ def assign_role_to_user(
 def get_assigned_roles(
     user_id: int,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("user_roles", "read")),
+    _: bool = Depends(has_permission("user_roles", "read")),
 ) -> UserRoleResponse:
     """Get all roles assigned to a user."""
 
@@ -59,7 +59,7 @@ def get_assigned_roles(
 )
 def get_my_roles(
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("user_roles", "read")),
+    _: bool = Depends(has_permission("user_roles", "read")),
 ) -> UserRoleResponse:
     """Get all roles assigned to a user."""
 
@@ -78,7 +78,7 @@ def deassign_role_to_user(
     user_id: int,
     body: UnassignRolesRequest,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("user_roles", "delete")),
+    _: bool = Depends(has_permission("user_roles", "delete")),
 ) -> None:
     """Deassign a role to a user."""
 

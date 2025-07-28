@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Form
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import check_permission, get_current_user_with_db
+from app.core.dependencies import get_current_user_with_db, has_permission
 from app.db.database import get_db
 from app.schemas.user_schema import (
     LoginUser,
@@ -11,9 +11,10 @@ from app.schemas.user_schema import (
     RegisterUserResponse,
     Token,
     UserRetrieveResponse,
+    UserRolesPermissionsResponse,
     UserUpdate,
 )
-from app.services.user_service import UserService
+from app.services.user_service import UserRolesPermissions, UserService
 
 router = APIRouter(prefix="/user")
 
@@ -50,6 +51,24 @@ def login_user(
 
 
 @router.get(
+    "/me",
+    response_model=UserRolesPermissionsResponse,
+    tags=["User"],
+    description="Get all roles and permission details of logged in user",
+)
+def get_roles_and_permissions(
+    user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
+        get_current_user_with_db
+    ),
+):
+    """Fetch all roles and permissions of loggedin user"""
+
+    user, db = user_with_db
+    service = UserRolesPermissions(db)
+    return service.get_roles_and_permissions(user.id)
+
+
+@router.get(
     "/all",
     response_model=list[RegisterUserResponse],
     tags=["Admin"],
@@ -59,7 +78,7 @@ def get_all_users(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("users", "read")),
+    _: bool = Depends(has_permission("users", "read")),
 ) -> list[RegisterUserResponse]:
     """Fetch all registered users."""
 
@@ -80,7 +99,7 @@ def get_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("users", "read", resource_id_param="user_id")),
+    _: bool = Depends(has_permission("users", "read", resource_id_param="user_id")),
 ) -> UserRetrieveResponse:
     """Fetch details of a specific user by ID."""
 
@@ -100,7 +119,7 @@ def update_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("users", "update")),
+    _: bool = Depends(has_permission("users", "update")),
 ) -> UserRetrieveResponse:
     """Update user details in the database."""
 
@@ -115,7 +134,7 @@ def delete_user(
     user_with_db: tuple[UserRetrieveResponse, Session] = Depends(
         get_current_user_with_db
     ),
-    _: bool = Depends(check_permission("users", "delete")),
+    _: bool = Depends(has_permission("users", "delete")),
 ):
     """Delete a user from the system."""
 

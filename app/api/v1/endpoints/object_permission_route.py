@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import check_permission, get_current_user_with_db
+from app.core.dependencies import get_current_user_with_db, has_permission
 from app.models import User
 from app.schemas.object_permission_schema import (
     AssignObjectPermissionRequest,
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/object-permission")
 def assign_object_permission_to_user(
     body: AssignObjectPermissionRequest,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("object_permissions", "create")),
+    _: bool = Depends(has_permission("object_permissions", "create")),
 ) -> None:
     """Assign a object permission to a user."""
 
@@ -45,7 +45,7 @@ def assign_object_permission_to_user(
 def deassign_object_permission_from_user(
     body: DeassignObjectPermissionRequest,
     user_with_db: tuple[User, Session] = Depends(get_current_user_with_db),
-    _: bool = Depends(check_permission("object_permissions", "delete")),
+    _: bool = Depends(has_permission("object_permissions", "delete")),
 ) -> None:
     """Deassign an object-level permission from a user."""
 

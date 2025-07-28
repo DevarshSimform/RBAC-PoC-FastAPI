@@ -3,8 +3,20 @@ from sqlalchemy.orm import Session
 
 from app.core.security import create_access_token
 from app.models.user import User
+from app.repositories.permission_repo import PermissionRepository
+from app.repositories.role_permission_repo import RolePermissionRepository
+from app.repositories.role_repo import RoleRepository
 from app.repositories.user_repo import UserRepository
-from app.schemas.user_schema import RegisterUser, Token, UserUpdate
+from app.repositories.user_role_repo import UserRoleRepository
+from app.schemas.permission_schema import PermissionResponse
+from app.schemas.role_schema import RoleResponse
+from app.schemas.user_schema import (
+    RegisterUser,
+    Token,
+    UserRetrieveResponse,
+    UserRolesPermissionsResponse,
+    UserUpdate,
+)
 
 
 class UserService:
@@ -75,3 +87,52 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
             )
+
+
+class UserRolesPermissions:
+
+    def __init__(self, db):
+        self.user_repo = UserRepository(db)
+        self.role_repo = RoleRepository(db)
+        self.permission_repo = PermissionRepository(db)
+        self.user_role_repo = UserRoleRepository(db)
+        self.role_permission_repo = RolePermissionRepository(db)
+
+    def get_roles_and_permissions(self, user_id):
+        user = self.user_repo.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+            )
+        user_schema = UserRetrieveResponse.from_orm(user)
+
+        existing_role_ids_for_user = self.user_role_repo.get_existing_role_ids(user_id)
+        role_ids = [role_id for (role_id,) in existing_role_ids_for_user]
+
+        roles_schema = []
+
+        for role_id in role_ids:
+            role = self.role_repo.get_role_by_id(role_id)
+            role_schema = RoleResponse.from_orm(role)
+            roles_schema.append(role_schema)
+
+        permission_ids = []
+        for role_id in role_ids:
+            raw_permissions = self.role_permission_repo.get_existing_permission_ids(
+                role_id
+            )
+            permissions = [perm_id for (perm_id,) in raw_permissions]
+
+            permission_ids.extend(permissions)
+        print(permission_ids)
+
+        permissions_schema = []
+
+        for permission_id in permission_ids:
+            permission = self.permission_repo.get_permission_by_id(permission_id)
+            permission_schema = PermissionResponse.from_orm(permission)
+            permissions_schema.append(permission_schema)
+
+        return UserRolesPermissionsResponse(
+            user_details=user_schema, roles=roles_schema, permissions=permissions_schema
+        )

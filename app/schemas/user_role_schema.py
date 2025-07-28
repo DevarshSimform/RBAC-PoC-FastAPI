@@ -16,4 +16,4 @@ class UserRoleResponse(BaseModel):
     role_ids: List[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

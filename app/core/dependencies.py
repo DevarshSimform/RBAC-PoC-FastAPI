@@ -53,7 +53,7 @@ def get_current_user_with_db(
     )
 
 
-def check_permission(
+def has_permission(
     module_name: str,
     action_name: str,
     resource_id_param: Optional[str] = None,
