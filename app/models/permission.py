@@ -1,6 +1,7 @@
 import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy.orm import relationship
 
 from app.db.database import Base
 
@@ -18,4 +19,14 @@ class Permission(Base):
 
     __table_args__ = (
         UniqueConstraint("module_id", "action_id", name="uq_module_action"),
+    )
+
+    module = relationship("Module", back_populates="permissions")
+    action = relationship("Action", back_populates="permissions")
+    creator = relationship("User", foreign_keys=[created_by])
+    role_links = relationship(
+        "RolePermission", back_populates="permission", cascade="all, delete-orphan"
+    )
+    user_links = relationship(
+        "UserPermission", back_populates="permission", cascade="all, delete-orphan"
     )

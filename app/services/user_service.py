@@ -124,7 +124,6 @@ class UserRolesPermissions:
             permissions = [perm_id for (perm_id,) in raw_permissions]
 
             permission_ids.extend(permissions)
-        print(permission_ids)
 
         permissions_schema = []
 

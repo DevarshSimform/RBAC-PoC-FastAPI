@@ -6,19 +6,21 @@ from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 
-class RolePermission(Base):
-    __tablename__ = "role_permissions"
+class UserPermission(Base):
+    __tablename__ = "user_permissions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     permission_id = Column(Integer, ForeignKey("permissions.id"), nullable=False)
     granted_by = Column(Integer, ForeignKey("users.id"))
     granted_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     __table_args__ = (
-        UniqueConstraint("role_id", "permission_id", name="uq_role_permission"),
+        UniqueConstraint("user_id", "permission_id", name="uq_user_permission"),
     )
 
-    role = relationship("Role", back_populates="role_permissions")
-    permission = relationship("Permission", back_populates="role_links")
+    user = relationship(
+        "User", back_populates="user_permissions", foreign_keys=[user_id]
+    )
+    permission = relationship("Permission", back_populates="user_links")
     grantor = relationship("User", foreign_keys=[granted_by])

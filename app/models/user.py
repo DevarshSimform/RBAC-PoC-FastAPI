@@ -1,6 +1,7 @@
 import datetime
 
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.db.database import Base
 
@@ -17,4 +18,17 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
+
+    roles = relationship(
+        "UserRole", back_populates="user", cascade="all, delete-orphan"
+    )
+    created_roles = relationship(
+        "Role", back_populates="creator", foreign_keys="Role.created_by"
+    )
+    assigned_roles = relationship(
+        "UserRole", back_populates="assigner", foreign_keys="UserRole.assigned_by"
+    )
+    user_permissions = relationship(
+        "UserPermission", back_populates="user", cascade="all, delete-orphan"
     )
