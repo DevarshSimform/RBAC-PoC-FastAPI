@@ -1,3 +1,4 @@
+import time
 from typing import Optional
 
 from fastapi import Depends, HTTPException, Request, status
@@ -62,83 +63,91 @@ def has_permission(
         request: Request,
         user_with_db: tuple = Depends(get_current_user_with_db),
     ):
-        user, db = user_with_db
+        start_time = time.perf_counter()  # ⏱ start timing
+        try:
+            user, db = user_with_db
 
-        # --- Resolve Permission ---
-        module = db.query(Module).filter_by(name=module_name).first()
-        action = db.query(Action).filter_by(name=action_name).first()
+            # --- Resolve Permission ---
+            module = db.query(Module).filter_by(name=module_name).first()
+            action = db.query(Action).filter_by(name=action_name).first()
 
-        if not module or not action:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid module or action name",
-            )
-
-        permission = (
-            db.query(Permission)
-            .filter_by(module_id=module.id, action_id=action.id)
-            .first()
-        )
-
-        if not permission:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permission not found for {module_name}:{action_name}",
-            )
-
-        # --- Check Role-Level Permissions ---
-        role_ids = db.query(UserRole.role_id).filter_by(user_id=user.id).all()
-        role_ids = [r[0] for r in role_ids]
-
-        has_role_permission = (
-            db.query(RolePermission)
-            .filter(
-                RolePermission.role_id.in_(role_ids),
-                RolePermission.permission_id == permission.id,
-            )
-            .first()
-        )
-
-        if has_role_permission:
-            return True
-
-        # --- Check Object-Level Permissions (if applicable) ---
-        if resource_id_param:
-            # Try to extract resource_id from path or query
-            resource_value = request.path_params.get(
-                resource_id_param
-            ) or request.query_params.get(resource_id_param)
-
-            if not resource_value:
+            if not module or not action:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Missing `{resource_id_param}` for object-level permission check.",
+                    detail="Invalid module or action name",
                 )
 
-            # Find resource by module + foreign_id
-            resource = (
-                db.query(Resource)
-                .filter_by(module_id=module.id, foreign_id=resource_value)
+            permission = (
+                db.query(Permission)
+                .filter_by(module_id=module.id, action_id=action.id)
                 .first()
             )
 
-            if resource:
-                object_permission = (
-                    db.query(ObjectPermission)
-                    .filter_by(
-                        user_id=user.id,
-                        resource_id=resource.id,
-                        permission_id=permission.id,
+            if not permission:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Permission not found for {module_name}:{action_name}",
+                )
+
+            # --- Check Role-Level Permissions ---
+            role_ids = db.query(UserRole.role_id).filter_by(user_id=user.id).all()
+            role_ids = [r[0] for r in role_ids]
+
+            has_role_permission = (
+                db.query(RolePermission)
+                .filter(
+                    RolePermission.role_id.in_(role_ids),
+                    RolePermission.permission_id == permission.id,
+                )
+                .first()
+            )
+
+            if has_role_permission:
+                return True
+
+            # --- Check Object-Level Permissions (if applicable) ---
+            if resource_id_param:
+                # Try to extract resource_id from path or query
+                resource_value = request.path_params.get(
+                    resource_id_param
+                ) or request.query_params.get(resource_id_param)
+
+                if not resource_value:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Missing `{resource_id_param}` for object-level permission check.",
                     )
+
+                # Find resource by module + foreign_id
+                resource = (
+                    db.query(Resource)
+                    .filter_by(module_id=module.id, foreign_id=resource_value)
                     .first()
                 )
-                if object_permission:
-                    return True
 
-        # --- Final Denial ---
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Access denied: missing permission for '{module_name}:{action_name}'",
-        )
+                if resource:
+                    object_permission = (
+                        db.query(ObjectPermission)
+                        .filter_by(
+                            user_id=user.id,
+                            resource_id=resource.id,
+                            permission_id=permission.id,
+                        )
+                        .first()
+                    )
+                    if object_permission:
+                        return True
+
+            # --- Final Denial ---
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied: missing permission for '{module_name}:{action_name}'",
+            )
+        finally:
+            end_time = time.perf_counter()  # ⏱ end timing
+            duration_ms = (end_time - start_time) * 1000
+            print(
+                f"-------------------------⏳ Permission check for '{module_name}:{action_name}' took {duration_ms:.2f} ms -------------------------"
+            )
 
     return checker

@@ -30,7 +30,7 @@ def assign_permission_to_role(
     user, db = user_with_db
     service = RolePermissionService(db)
     service.assign_permission_to_role(role_id, body.permission_ids, granted_by=user.id)
-    return {"message": "Permissions assigned successfully."}
+    return {"message": "Permissions assigned to role successfully."}
 
 
 @router.get(
