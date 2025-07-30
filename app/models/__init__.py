@@ -7,4 +7,5 @@ from app.models.resource import Base, Resource  # noqa: F811 F401
 from app.models.role import Base, Role  # noqa: F811 F401
 from app.models.role_permission import Base, RolePermission  # noqa: F811 F401
 from app.models.user import Base, User  # noqa: F811 F401
+from app.models.user_permission import Base, UserPermission  # noqa: F811 F401
 from app.models.user_role import Base, UserRole  # noqa: F811 F401

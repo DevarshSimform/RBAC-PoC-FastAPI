@@ -21,7 +21,10 @@ class User(Base):
     )
 
     roles = relationship(
-        "UserRole", back_populates="user", cascade="all, delete-orphan"
+        "UserRole",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        foreign_keys="UserRole.user_id",
     )
     created_roles = relationship(
         "Role", back_populates="creator", foreign_keys="Role.created_by"
@@ -30,5 +33,13 @@ class User(Base):
         "UserRole", back_populates="assigner", foreign_keys="UserRole.assigned_by"
     )
     user_permissions = relationship(
-        "UserPermission", back_populates="user", cascade="all, delete-orphan"
+        "UserPermission",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        foreign_keys="UserPermission.user_id",
+    )
+    granted_permissions = relationship(
+        "UserPermission",
+        back_populates="grantor",
+        foreign_keys="UserPermission.granted_by",
     )
