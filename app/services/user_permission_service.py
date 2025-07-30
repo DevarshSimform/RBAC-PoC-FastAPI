@@ -32,4 +32,11 @@ class UserPermissionService:
     ) -> None:
         """Deassign permissions from a user."""
 
-        pass
+        deleted_permissions = self.user_permission_repo.deassign_user_permissions(
+            user_id, permission_ids
+        )
+        if not deleted_permissions:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Permissions not found for the user.",
+            )

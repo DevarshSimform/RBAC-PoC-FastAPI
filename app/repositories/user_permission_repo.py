@@ -31,3 +31,22 @@ class UserPermissionRepository:
         self.db.commit()
         self.db.flush()
         self.db.refresh(new_user_permission)
+
+    def deassign_user_permissions(
+        self, user_id: int, permission_ids: list[int]
+    ) -> None:
+        """Deassign permissions from a user."""
+        permissions_to_delete = (
+            self.db.query(UserPermission)
+            .filter(
+                UserPermission.user_id == user_id,
+                UserPermission.permission_id.in_(permission_ids),
+            )
+            .all()
+        )
+        if not permissions_to_delete:
+            return False
+        for permission in permissions_to_delete:
+            self.db.delete(permission)
+        self.db.commit()
+        return True

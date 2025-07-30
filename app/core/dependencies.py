@@ -15,6 +15,7 @@ from app.models import (
     Resource,
     RolePermission,
     User,
+    UserPermission,
     UserRole,
 )
 
@@ -67,7 +68,7 @@ def has_permission(
         try:
             user, db = user_with_db
 
-            # --- Resolve Permission ---
+            # --- Resolve Module, Action & Permission ---
             module = db.query(Module).filter_by(name=module_name).first()
             action = db.query(Action).filter_by(name=action_name).first()
 
@@ -89,25 +90,35 @@ def has_permission(
                     detail=f"Permission not found for {module_name}:{action_name}",
                 )
 
-            # --- Check Role-Level Permissions ---
-            role_ids = db.query(UserRole.role_id).filter_by(user_id=user.id).all()
-            role_ids = [r[0] for r in role_ids]
+            # 1) Get all permissions directly assigned to the user
+            user_permission_ids = {
+                p.permission_id
+                for p in db.query(UserPermission.permission_id)
+                .filter_by(user_id=user.id)
+                .all()
+            }
 
-            has_role_permission = (
-                db.query(RolePermission)
-                .filter(
-                    RolePermission.role_id.in_(role_ids),
-                    RolePermission.permission_id == permission.id,
-                )
-                .first()
-            )
+            # 2) Get all permissions from roles
+            role_ids = [
+                r[0]
+                for r in db.query(UserRole.role_id).filter_by(user_id=user.id).all()
+            ]
+            role_permission_ids = {
+                rp.permission_id
+                for rp in db.query(RolePermission.permission_id)
+                .filter(RolePermission.role_id.in_(role_ids))
+                .all()
+            }
 
-            if has_role_permission:
+            # 3) Union of both sets (user-level + role-level)
+            all_permission_ids = user_permission_ids.union(role_permission_ids)
+
+            # 4) Check if the required permission exists in the union
+            if permission.id in all_permission_ids:
                 return True
 
-            # --- Check Object-Level Permissions (if applicable) ---
+            # 5) If not found yet, check object-level permissions (if applicable)
             if resource_id_param:
-                # Try to extract resource_id from path or query
                 resource_value = request.path_params.get(
                     resource_id_param
                 ) or request.query_params.get(resource_id_param)
@@ -118,7 +129,6 @@ def has_permission(
                         detail=f"Missing `{resource_id_param}` for object-level permission check.",
                     )
 
-                # Find resource by module + foreign_id
                 resource = (
                     db.query(Resource)
                     .filter_by(module_id=module.id, foreign_id=resource_value)
@@ -126,7 +136,7 @@ def has_permission(
                 )
 
                 if resource:
-                    object_permission = (
+                    obj_perm = (
                         db.query(ObjectPermission)
                         .filter_by(
                             user_id=user.id,
@@ -135,16 +145,17 @@ def has_permission(
                         )
                         .first()
                     )
-                    if object_permission:
+                    if obj_perm:
                         return True
 
-            # --- Final Denial ---
+            # If no permission is found
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Access denied: missing permission for '{module_name}:{action_name}'",
             )
+
         finally:
-            end_time = time.perf_counter()  # ⏱ end timing
+            end_time = time.perf_counter()
             duration_ms = (end_time - start_time) * 1000
             print(
                 f"-------------------------⏳ Permission check for '{module_name}:{action_name}' took {duration_ms:.2f} ms -------------------------"
