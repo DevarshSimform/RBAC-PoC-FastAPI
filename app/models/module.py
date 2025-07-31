@@ -14,4 +14,6 @@ class Module(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     created_by = Column(String, ForeignKey("users.id"))
 
-    permissions = relationship("Permission", back_populates="module")
+    permissions = relationship(
+        "Permission", back_populates="module", cascade="all, delete-orphan"
+    )

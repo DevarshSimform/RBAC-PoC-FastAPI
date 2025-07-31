@@ -83,7 +83,6 @@ def get_all_users(
     """Fetch all registered users."""
 
     user, db = user_with_db
-    print(f"----------User = {user.email}----------")
     service = UserService(db)
     return service.get_all_users()
 

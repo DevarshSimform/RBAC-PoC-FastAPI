@@ -23,4 +23,6 @@ class UserPermission(Base):
         "User", back_populates="user_permissions", foreign_keys=[user_id]
     )
     permission = relationship("Permission", back_populates="user_links")
-    grantor = relationship("User", foreign_keys=[granted_by])
+    grantor = relationship(
+        "User", back_populates="granted_permissions", foreign_keys=[granted_by]
+    )
