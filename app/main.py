@@ -6,6 +6,7 @@ from app.api.v1.endpoints.object_permission_route import (
 )
 from app.api.v1.endpoints.role_permission_route import router as role_permission_router
 from app.api.v1.endpoints.role_route import router as role_router
+from app.api.v1.endpoints.user_permission_route import router as user_permission_router
 from app.api.v1.endpoints.user_role_route import router as user_role_router
 from app.api.v1.endpoints.user_route import router as user_router
 
@@ -28,6 +29,7 @@ app.include_router(user_router, prefix="/api/v1")
 app.include_router(role_router, prefix="/api/v1")
 app.include_router(user_role_router, prefix="/api/v1")
 app.include_router(role_permission_router, prefix="/api/v1")
+app.include_router(user_permission_router, prefix="/api/v1")
 app.include_router(object_permission_router, prefix="/api/v1")
 
 

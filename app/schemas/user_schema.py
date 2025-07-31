@@ -1,6 +1,10 @@
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, EmailStr, Field
+
+from app.schemas.permission_schema import PermissionResponse
+from app.schemas.role_schema import RoleResponse
 
 
 class RegisterUser(BaseModel):
@@ -46,7 +50,7 @@ class UserRetrieveResponse(RegisterUserResponse):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserUpdate(BaseModel):
@@ -56,4 +60,15 @@ class UserUpdate(BaseModel):
     lastname: str | None = Field(None, min_length=2)
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class UserRolesPermissionsResponse(BaseModel):
+    """Schema to get list of assigned role and permissions to user"""
+
+    user_details: UserRetrieveResponse
+    roles: List[RoleResponse]
+    permissions: List[PermissionResponse]
+
+    class Config:
+        from_attributes = True

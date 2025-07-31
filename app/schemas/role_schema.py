@@ -14,7 +14,7 @@ class RoleResponse(BaseModel):
     description: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RoleUpdate(BaseModel):
@@ -22,4 +22,4 @@ class RoleUpdate(BaseModel):
     description: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -7,14 +7,14 @@ class AssignPermissionRequest(BaseModel):
     permission_ids: List[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DeAssignPermissionRequest(BaseModel):
     permission_ids: List[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RolePermissionItem(BaseModel):
@@ -22,7 +22,7 @@ class RolePermissionItem(BaseModel):
     permissions: List[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RolePermissionResponse(BaseModel):
@@ -30,4 +30,4 @@ class RolePermissionResponse(BaseModel):
     roles: List[RolePermissionItem]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
