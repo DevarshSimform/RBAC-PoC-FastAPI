@@ -289,12 +289,6 @@ docker run -p 8000:8000 fastapi-rbac
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
----
-
 ## 🔄 Migration History
 
 To view migration history:
